@@ -1,562 +1,493 @@
-bitcoin-transactions
+bitcoin-transactions - Discover and move your coins by yourself
 ===
 
-Claim your coins and move/manage them by yourself: Bitcoin transactions made simple for standard or multisig wallets, segwit is supported, create and send by your own your Bitcoin, Bitcoin Cash, Bitcoin Gold, Bitcoin Diamond, Super Bitcoin, Bitcore, Zcash, Litecoin, DOGE, Dash, tec transactions, manage your keys and do not disclose them to dubious wallets software
+Javascript implementation of the Bitcoin protocol for any Bitcoin based coins, on server and inside browsers as a standalone offline webapp, this module offers all the tools to manage your addresses and transactions by yourself without the need to sync a full node and/or use a wallet that you don't trust
 
-## Support
+## Funding and license
+
+This module is funded by [NLnet](https://nlnet.nl/) under the [EU Horizon 2020 Next Generation internet Search and Discovery call](https://nlnet.nl/discovery/)
+
+Therefore the initial dev fees have been removed and the code is open source and provided in clear under a MIT license
+
+## Dependencies
+
+This module is using the very good [Elliptic](https://github.com/indutny/elliptic), [BS58](https://github.com/cryptocoinjs/bs58), [BECH32](https://github.com/sipa/bech32), [Forge SHA256](https://github.com/digitalbazaar/forge), [Browserify](https://github.com/browserify/browserify), [Terser](https://github.com/terser-js/terser) and other modules from us under a MIT license
+
+## Browser version
+
+The browser version is [here](https://peersm.com/wallet)
+
+In case you don't see how to use it for some parts, please refer to the documentation and examples here
+
+## Installation (nodejs version)
+
+Install [nodejs for Windows,Mac,Linux](https://nodejs.org/en/download/package-manager/), usually this is easy
+
+Create a bitcoin-transactions directory, download and unzip [master](https://github.com/Ayms/bitcoin-transactions/archive/master.zip)
+	
+## Support and supported coins
 
 If you experience some issues with this module or don't feel comfortable to use it by yourself, or just don't know how to use it, please email at our github address or email contact peersm com, or post an issue
 
-## Standalone and offline tool inside browsers
+If you don't know very well how to find your transactions, your can refer to the [initial doc](https://github.com/Ayms/bitcoin-transactions/blob/master/README_previous.md)
 
-If you don't want/know how to use the command line stuff you can use the tool from your browser [here](https://peersm.com/wallet)
+The list of supported coins is [here](https://github.com/Ayms/bitcoin-transactions/blob/master/README_previous.md#supported-coins), as you can see the tool does support a lot of coins, most of them not being serious, we do not intend to support additional non serious coins 
 
-This is a browserfication of this module, then a secure standalone application inside browsers, nothing is sent/queried outside, you can use it offline
+## Create wallet
 
-Dev fees still apply in the web app, they will be removed from this module/web app should the equivalent of 5 BTCs be reached in terms of founding/donation (and then the code will be released in clear and open source)
-
-## Quick Start guide
-
-If you don't know very well where to start here and don't want to read what follows, then please use the easy way:
-
-1- start [installing](https://github.com/Ayms/bitcoin-transactions#installation) and see how to use the command line mode if you are not used to it, this is easy
-
-2- run the ``createauto`` command that will find your coins automatically and output the transaction to be sent:
-
-Standard: ``node tx.js BTCP createauto addr1_addr2_..._addrn privkey1_privkey2_..._privkeyn destination_address``
-
-Multisig: ``node tx.js BTCP createauto addr1_addr2_..._addrn <priv1 addr1-priv2 addr1-redeem-2of2 or 2of3 or 2of4>_..._<priv1 addrn-priv2 addrn-redeem-2of2 or 2of3 or 2of4> destination_address``
-
-Segwit standard: ``node tx.js BTCP createauto addr1-segwit_addr2-segwit_..._addrn-segwit privkey1_privkey2_..._privkeyn destination_address``
-
-Segwit multisig: ``node tx.js BTCP createauto addr1-segwit_addr2-segwit_..._addrn-segwit <priv1 addr1-priv2 addr1-redeem-2of2 or 2of3 or 2of4>_..._<priv1 addrn-priv2 addrn-redeem-2of2 or 2of3 or 2of4> destination_address``
-
-3- you will get an impressive bunch of logs but understandable, check carefully that the transaction is correct
-
-4- send the transaction to the network:
-
-paste the <b>``body`` (and not the ``complete transaction``)</b> in an explorer (example: https://explorer.btcprivate.org/tx/send as shown in [supported coins](https://github.com/Ayms/bitcoin-transactions#supported-coins) section), this is the easiest method
-
-or
-
-node tx.js BTCP send ``complete transaction`` ``advised full node`` (as shown in [supported coins](https://github.com/Ayms/bitcoin-transactions#supported-coins) section)
-
-## Convert addresses
-
-You can use the legacy or bech32 addresses, the tool will convert them automatically, however you might need sometimes to convert addresses to find your coins with the explorers, example for BTCP:
-
-``node tx.js convert BTCP 139AJaowXYerd9hrAyieWyzRxLVzaEP9PN``
-
-	Address 139AJaowXYerd9hrAyieWyzRxLVzaEP9PN converted to b16cMymewGhgxkS2R889d7Uy7acD4sk1j3s
+	node tx.js <coin> createwallet <secret> <nb optional> <path optional>
 	
-To convert a bech32 address you can do:
+	Example:
+	
+	node tx.js BTC createwallet 4ecf2e71d567072fe2f9cda40873afcaae4224e3f249018621a90dd43e88f8de 100 "m/44'/0'/0'/0/500"
 
-``node tx.js BTC convert bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4``
 
-which will output ``Address 3JvL6Ymt8MVWiCNHC7oWU6nLeHNJKLZGLN converted to 3JvL6Ymt8MVWiCNHC7oWU6nLeHNJKLZGLN``, which just means that bech32 address bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4 is 3JvL6Ymt8MVWiCNHC7oWU6nLeHNJKLZGLN
+See the test vectors in https://github.com/Ayms/bitcoin-transactions/blob/master/tests/wallet.txt
 
-or 
+``<coin>`` is the type of coin, ``<secret>`` is a BIP32 seed (32 bytes) or a xprv derived seed, nb is the number of addresses to be generated, path is the derivation path (it defaults to the standard path or BIP44 path), the "'" stands for hardened addresses
 
-``node tx.js BTG convert bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4``
+You can also use ``create_wallet <coin> <secret>`` where secret is an already generated hd object to iterate on it
 
-which will output ``Address 3JvL6Ymt8MVWiCNHC7oWU6nLeHNJKLZGLN converted to AZ1BpW94ubqHRzsqdfoFCMgVyN1H4CnSEp``, which just means that bech32 BTC address bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4 is BTG address AZ1BpW94ubqHRzsqdfoFCMgVyN1H4CnSEp
+Since we did implement it before Zcash team, we kept our implementation for z-addresses, now please note that this is probably not following the BIP32 Zcash implementation
 
-### Getting your parameters
+## Create transactions
 
-## If you know how to use an explorer and identify where were your coins before the fork:
+For a really detailed explanation of how transactions work please refer to the initial documentation above
 
-![tuto1](https://raw.github.com/Ayms/bitcoin-transactions/master/tuto1.png)
-![tuto2](https://raw.github.com/Ayms/bitcoin-transactions/master/tuto2.png)
+The general syntax is:
 
-To quickly move/claim coins to an exchange for example, you can look [Claiming your coins (BCH,BTG,BCD,SBTC,CDY,etc) - Addresses and getting 'free' coins](https://github.com/Ayms/bitcoin-transactions#claiming-your-coins-bchbtgbcdsbtccdyetc---addresses-and-getting-free-coins) or [Tool to claim coins for all Bitcoin forks without using wallets or running nodes](https://bitcointalk.org/index.php?topic=2827163.msg31273044#msg31273044)
+``node tx.js <coin> create prevtx=tx1_tx2... prevaddr=prevaddr1_prevaddr2_... prevamount=amount1_amount2_... previndex=index1_index2... privkey=privkey1_privKey2 addr=addr1_addr2... fees=fees amount=amount1_amount2 optional``
 
-## If you don't know how to use an explorer to identify where were your coins before the fork:
+- prevtx are the transactions ids of the outputs to be spent
+- prevaddr are the addresses of the outputs to be spent
+- amount are the amounts of the outputs to be spent
+- previndex are the indexes of the outputs to be spent (warning: it starts with zero)
+- privkey are the private keys or redeem scripts corresponding to prevaddr
+- addr are the destination addresses
+- fees are the network fees
+- amount are the amounts to be sent, the delta will be refunded to the first prevaddr address, if omitted the total of prevamounts minus the network fees will go to the destination address, if there is several destination addresses, there must be the same number of amounts, same as before in that case if there is a delta for the sum of amounts + fees compared to the total of prevamounts, it will be refunded to the first prevaddr
 
-You can use [Find My Coins .ninja](http://www.findmycoins.ninja/), enter one of your addresses and copy the full report:
+If prevaddr corresponds to a segwit address, you must use prevaddr=prevaddr1-segwit_prevaddr2-segwit_...
 
-![tuto3](https://raw.github.com/Ayms/bitcoin-transactions/master/tuto3.png)
+In that case, if prevaddr is not a bech32 address it will create a segwit "nested into p2sh" transaction, if not it will create a legacy segwit transaction
 
-You will get this:
+Same thing applies if a destination address is a bech32 one or not
 
-![tuto4](https://raw.github.com/Ayms/bitcoin-transactions/master/tuto4.png)
+The best is to refer to all the examples in [test vectors](https://github.com/Ayms/bitcoin-transactions/blob/master/tests/vectors_tx.js) and [test vectors multiple addresses](https://github.com/Ayms/bitcoin-transactions/blob/master/tests/vectors_tx_multi_dest.js)
 
-<b>Which even give you the commands to use with the tool</b>, if you have several addresses and are an advanced user you can run this for each address and group the inputs as explained in [Multiple inputs](https://github.com/Ayms/bitcoin-transactions#multiple-inputs-1)
+The calculation for the fees is:
 
-Still you can doublecheck that the parameters are correct at the end of the full report :
+	Sum of amount+network fees=Sum of prevamounts
 
-![tuto6](https://raw.github.com/Ayms/bitcoin-transactions/master/tuto6.png)
-
-If something does not look correct when using the tool, please email us or post an issue (always without your private keys)
-
+You must choose the fees according to the rules of the coin used, do not go below ~1 satoshi per byte or your transaction will not be accepted by the network, due to rounding issues there can be one satoshi floating around
+	
 ### Standard wallets
 
-	node tx.js acronym create prevtx= prevaddr=addr prevamount= previndex= privkey= addr= fees=0.00000300
+	node tx.js <coin> create prevtx= prevaddr=addr prevamount= previndex= privkey= addr= fees=0.00000300
 	
 ### Multisig wallets
 
-If you don't know how to retrieve the redeem script corresponding to your address, please see [Retrieving the redeem script](https://github.com/Ayms/bitcoin-transactions#multisig-wallets-2) or email us (if you spent this address on another network we can retrieve the redeem script from the corresponding transactions)
-
-	node tx.js acronym create prevtx= prevaddr=addr prevamount= previndex= privkey=priv1-priv2-redeem-2of2 or 2of3 or 2of4 addr= fee=0.00000500
+	node tx.js <coin> create prevtx= prevaddr=addr prevamount= previndex= privkey=priv1-priv2-redeem-mofn addr= fee=0.00000500
 	
 ### Segwit
 
-If you coins are on a segwit address you must add the ``-segwit`` string in prevaddr:
+If your coins are on a segwit address you must add the ``-segwit`` string in prevaddr:
 
 #### P2WPKH
 
-	node tx.js acronym create prevtx= prevaddr=addr-segwit prevamount= previndex= privkey= addr= fees=0.00000300
+	node tx.js <coin> create prevtx= prevaddr=addr-segwit prevamount= previndex= privkey= addr= fees=0.00000300
 	
 #### P2WSH (multisig)
 
-	node tx.js acronym create prevtx= prevaddr=addr-segwit prevamount= previndex= privkey=priv1-priv2-redeem-2of2 or 2of3 or 2of4 addr= fee=0.00000500
+	node tx.js <coin> create prevtx= prevaddr=addr-segwit prevamount= previndex= privkey=priv1-priv2-redeem-mofn addr= fee=0.00000500
 	
 ### Multiple inputs
 
-Same as above depending on the type of address with a ``_`` separator, please see [Multiple inputs](https://github.com/Ayms/bitcoin-transactions#multiple-inputs-1) section below
+Same as above with a ``_`` separator for all fields, if the data is the same (for example all outputs corresponding to the same address), then just put it once not using ``_``
+
+### Mixed inputs
+
+You can mix all kind of transactions using the ``_`` separator, please see the last example in [test vectors](https://github.com/Ayms/bitcoin-transactions/blob/master/tests/vectors_tx.js)
 	
 ### Sending your transaction
 
 The difference between ``complete transaction`` and ``body`` in the output of the ``create`` command is just that ``complete transaction`` includes the ``body`` with the network headers:
 
-node tx.js acronym send ``complete transaction`` ``advised full node`` (as shown in [supported coins](https://github.com/Ayms/bitcoin-transactions#supported-coins) section)
+node tx.js <coin> send ``complete transaction`` ``advised full node`` (as shown in [here](https://github.com/Ayms/bitcoin-transactions/blob/master/README_previous.md#supported-coins) section)
 	
 or
 	
 paste the <b>``body`` (and not the ``complete transaction``)</b> in an explorer (example: https://btgexplorer.com/tx/send or https://explorer.btcprivate.org/tx/send)
 	
-### Examples
-
-#### Standard
-
-`node tx.js BTG create prevtx=d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206 prevaddr=GSjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo prevamount=0.00998277 previndex=31 privkey=privkey addr=GKz5ii8tWQG9hd196vNkwkLKsWHqaeKSoB fees=0.00000300`
-
-#### Multisig
-
-`node tx.js BTG create prevtx=d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206 prevaddr=AMjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo prevamount=0.00998277 previndex=31 privkey=privkey1-privkey2-redeem-2of3 addr=GKz5ii8tWQG9hd196vNkwkLKsWHqaeKSoB fees=0.00000500`
-
-#### Segwit P2WPKH (standard)
-
-`node tx.js BTG create prevtx=d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206 prevaddr=ASjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo-segwit prevamount=0.00998277 previndex=31 privkey=privkey addr=GKz5ii8tWQG9hd196vNkwkLKsWHqaeKSoB fees=0.00000300`
-
-#### Segwit P2WSH (multisig)
-
-`node tx.js BTG create prevtx=d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206 prevaddr=ATjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo-segwit prevamount=0.00998277 previndex=31 privkey=privkey1-privkey2-redeem-2of3 addr=GKz5ii8tWQG9hd196vNkwkLKsWHqaeKSoB fees=0.00000500`
-
-#### Sending
-
-node tx.js BTG send <b>``complete transaction``</b> btg.suprnova.cc
-
-or
-
-paste the <b>``body``</b> in https://btgexplorer.com/tx/send or https://explorer.btcprivate.org/tx/send
-
-### Amounts and fees
+If you used the first method you can also check that your transaction is in mempool (see in the code and uncomment)
 	
-The module will calculate the amount to be spent according to the fees and advise if the numbers are not coherent:
+### Important warning
 
-	amount+dev fees+network fees=prevamount
+The tool double checks many times many things, now if you make a mistake with the destination address it can't detect it, be sure to use an address that you master
+
+The tool can detect mistakes made with the amounts also but not always, be carefull for example not to send everything as network fees
+
+Check carefully the output of the create command, you will see the details of the transaction, you MUST at the end get "Transaction verified" AND "serialize/deserialize OK", if you don't get this then something is wrong with your parameters
+
+## Decode transactions
+
+	node tx.js <coin> decode <body of the transaction>
+
+Note: once an output corresponding to an address is spent then the corresponding public key or redeem script becomes public, this feature allows you to see it, this eliminates one check to validate further transactions involving this address, that's why it is not recommended to reuse same addresses
+
+See Sign/Verify messages below also
 	
-You can adjust the fees if you like according to the size of the transaction instead of using 0.00000300 or 0.00000500
+## Verify transactions
 
-## Supported coins
-
-Please see below the supported coins and acronym to be used, as well as explorer link to send your transactions or full nodes, use/tests cases, fork height and explorer
-
-### Forked coins
-
-<b>Bitcoin SV (Warning this fork does not implement any replay protection with BCH and BCP)</b> "BSV" - bitcoinsv.io or seed.bitcoinsv.io - please note that this is a Bitcoin cash fork, same use than the others - Height: 15th November 2018
-
-<b>Bitcoin Clean (Warning this fork does not implement any replay protection with BTC)</b> "BCL" - seed.bitcoinclean.org - same use than the others - Height: 518800
-
-<b>New Bitcoin</b> "NBTC" - 1.newbitcoin.org or 2/3/4 1.manghao.com or 2/3/4 - same use than the others but you are supposed to multiply the amounts by 2, don't do it with this tool, keep the original numbers and this will work the same (ie you will get the double on NBTC) - Height: 501225
-
-<b>Big Bitcoin</b> "BBC" - seed.bigbitcoins.org - same use than the others but you must multiply the amounts by 10 - Height: 508888
-
-<b>Bitcoin God</b> "GOD" - s.bitcoingod.org - same use than the others - Height: 501226 - Explorer: http://explorer.bitcoingod.org
-
-<b>Bitcoin Hush</b> "BTCH" - https://explorer.btchush.org/tx/send or seeds.komodoplatform.com - same use than the others - Height: 507089 - Explorer: https://explorer.btchush.org/
-
-<b>Bitcoin@CBC</b> "BCBC" - btcseed.cleanblockchain.io or btcseed.cleanblockchain.org - same use than the others - Height: 498754 - Explorer: http://be.cleanblockchain.org/
-
-<b>Bitcoin Interest (Warning this fork does not implement any replay protection with BTG)</b> "BCI" -  https://explorer.bitcoininterest.io/tx/send or seeder1.bci-server.com or seeder2/3.bci-server.com or 216.250.117.221- 74.208.166.57 - 50.27.27.80 - 66.85.74.54 - 69.195.159.106 - 69.195.157.106 - 74.208.235.89 - same use than the others - Height: 505083 - Explorer: https://explorer.bitcoininterest.io/
-
-<b>Lightning Bitcoin</b> "LBTC" - seed10.lbtc.io - same use than the others - Height: 499888 - Explorer: http://explorer.lbtc.io
-
-<b>BitClassic Coin</b> "BICC" - 47.104.59.46 or 47.104.59.9 - same use than the others - Height: 499888 - Explorer: http://info.bicc.io
-
-<b>Litecoin Cash</b> "LCC" - seeds.litecoinca.sh - Litecoin fork, you must multiply the numbers by 10 - Height: 1371111 - Explorer: https://explorer.litecoinca.sh
-
-<b>Bitcoin Community</b> "BTSQ" - seed1.aliyinke.com (or seed2/seed3) - Same as BCD except that you must multiply the numbers by 1000 - Height: 506066
-
-<b>Bitcoin King</b> "BCK" - 47.52.28.49 - same use than the others - Height 499999
-
-<b>Bitcoin Pay</b> "BTP" - http://exp.btceasypay.com/insight/tx/send - Same as BCD except that you must multiply the numbers by 10 - Height: 499345 - Explorer: http://exp.btceasypay.com/insight/
-
-<b>Bitcoin Top</b> "BTT" - dnsseed.bitcointop.org - same use than the others - Height: 501118
-
-<b>Bitcoin Vote</b> "BTV" - https://block.bitvote.one/address/tx/send or seed1.bitvote.one - same use than the others - Height: 505050 - Explorer: https://block.bitvote.one/address
-
-<b>Bitcoin Hot</b> "BTH" - seed-us.bitcoinhot.co - Same as BCD except that you must multiply the numbers by 100 - Height: 498848 - Explorer: block.bithot.org
-
-<b>Bitcoin New</b> "BTN" - dnsseed.bitcoin-new.org - same use than the others - Height: 501000 - Explorer: http://bitcoin-new.org/
-
-<b>Bitcoin X</b> "BCX" - https://bcx.info/tx/send or 192.169.227.48 - Same as BCD except that you must multiply the numbers by 10000 - Height: 498888 - Explorer: https://bcx.info
-
-<b>Bitcoin Faith</b> "BTF" - a.btf.hjy.cc - same use than the others - Height: 500000
-
-<b>Bitcoin World</b> "BTW" - dnsseed.btw.one - Same as BCD except that you must multiply the numbers by 10000 - Height: 499777
-
-<b>World Bitcoin</b> "WBTC" - dnsseed.wbtcteam.org - same use than the others - Height: 503888 - Explorer: http://142.44.242.32:3001/
-
-<b>Bitcoin Atom</b> "BCA" - https://explorer.bitcoinatom.io/rpc-terminal (sendrawtransaction ``body``) or seed.bitcoinatom.io or seed.bitcoin-atom.org or seed.bitcoinatom.net - same use than the others - Height: 505888 - Explorer: https://explorer.bitcoinatom.io
-
-<b>Bitcoin Candy</b> "CDY" - http://block.cdy.one/tx/send or seed.bitcoincandy.one or seed.cdy.one - please note that this a Bitcoin Cash fork and read [Specific case of CDY](https://github.com/Ayms/bitcoin-transactions#specific-case-of-cdy) and see [cdy.js](https://github.com/Ayms/bitcoin-transactions/blob/master/cdy.js) - Height: 512666 - Explorer: http://block.cdy.one/
-
-<b>Bitcoin Cash Plus (Warning: this fork does not implement any replay protection with BCH</b>) "BCP" - http://bcpexp.org/tx/send or seed.bitcoincashplus.org - same use than the others - Height: 501407 - Explorer: http://bcpexp.org/
-
-<b>Bitcoin Private</b> "BTCP" - https://explorer.btcprivate.org/tx/send  or btcp.suprnova.cc - please note that this a BTC and Zcash Classic (ZCL) fork, please look [here](https://bitcointalk.org/index.php?topic=2827163.msg31911075#msg31911075) to move/claim ZCL and BTC on BTCP - Height: 511346 BTC - 272991 ZCL - Explorer: https://explorer.btcprivate.org
-
-<b>Bitcoin Pizza</b> "BPA" - 89.38.97.62 or 46.28.204.17 - same use than the others - Height: 501888 - Explorer: http://47.100.55.227/info/
-
-<b>SegwitB2X</b> "B2X" - https://explorer.b2x-segwit.io/tx/send or node1.b2x-segwit.io (or node2/3) - see [b2x.js](https://github.com/Ayms/bitcoin-transactions/blob/master/b2x.js) - Height: 501451 - Explorer: https://explorer.b2x-segwit.io/tx/send
-
-<b>United Bitcoin</b> "UBTC" - ip.ub.com - see [ubtc.js](https://github.com/Ayms/bitcoin-transactions/blob/master/ubtc.js) - Height: 498777 - Explorer: https://www.ub.com/explorer/
-
-<b>Bitcoin Gold</b> "BTG" -  https://btgexplorer.com/tx/send or btg.suprnova.cc  - see below and https://github.com/Ayms/bitcoin-transactions/issues/5 - Height: 491407 - Explorer:  https://explorer.bitcoingold.org/
-
-<b>Bitcoin Cash</b> "BCH" - https://blockdozer.com/tx/send or bch.suprnova.cc - see https://github.com/Ayms/bitcoin-transactions/issues/4 and [example-4.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-4.js) and [Specific case of BCH](https://github.com/Ayms/bitcoin-transactions#specific-case-of-bch) for the new address format - Height: 478559 - Explorer: https://blockdozer.com/tx/send
-
-<b>Bitcoin Diamond</b> "BCD" - seed1.dns.btcd.io or 139.198.190.221 or 121.201.13.117 - please read [Specific case of BCD](https://github.com/Ayms/bitcoin-transactions#specific-case-of-bcd) and see [bcd.js](https://github.com/Ayms/bitcoin-transactions/blob/master/bcd.js) - Height: 495866 - Explorer: http://explorer.btcd.io
-
-<b>Super Bitcoin</b> "SBTC" - http://block.superbtc.org/tx/send or seed.superbtca.com - Height: 498888 - Explorer: http://block.superbtc.org/
-
-<b>Bitcore</b> "BTX" - btx.suprnova.cc - Height: 492820 - Explorer: https://chainz.cryptoid.info/btx
-
-Keep in mind that most of those forks are probably scams, so in any case never use their wallets
-
-### Legacy coins
-
-<b>Bitcoin Core</b> "BTC" - https://blockexplorer.com/tx/send or bitcoin.sipa.be - see https://github.com/Ayms/bitcoin-transactions/blob/master/verify.txt - Explorer: https://blockchain.info/
-
-<b>Zcash</b> "ZEC" - https://explorer.zcashfr.io/insight/tx/send or mainnet.z.cash - see https://github.com/Ayms/bitcoin-transactions/blob/master/verify.txt - Explorer: https://explorer.zcashfr.io/insight/
-
-<b>Litecoin</b> "LTC" - ltc.suprnova.cc - see https://github.com/Ayms/bitcoin-transactions/blob/master/verify.txt - Explorer: https://live.blockcypher.com/ltc
-
-<b>Dogecoin</b> "DOGE" - 5.135.158.86 - Explorer: https://dogechain.info/
-
-<b>Dash</b> "DASH" - dash.suprnova.cc - Explorer: https://chainz.cryptoid.info/dash/
-
-<b>ZClassic</b> "ZCL" - eu1.zclassic.org - Explorer: 
-
-## Rationale
-
-This module is equivalent to bitcoin-cli for some features but much more simple to use. To use bitcoin-cli you need to run the full bitcoin software, sync with the network and then sync your wallet.
-
-This is a nightmare for quite a lot of people since syncing a full node can take 10 days and most likely will fail at the end
-
-And this does not help the network since even if you succeed to sync from home most likely you will run a non efficient full node
-
-<b>In addition many people lost everything by using malware wallets trying to get their 'free' coins, and apparently there are some common misunderstanding with the addresses format, please see the [Claiming your coins (BCH, BTG, BCD,CDY,etc) - Adresses and getting "free" coins](https://github.com/Ayms/bitcoin-transactions#claiming-your-coins-bchbtgbcdsbtccdyetc---addresses-and-getting-free-coins)</b>
-
-And finally, if you succeeded to sync you can prune after but you still need to run constantly the bitcoin software
-
-The whole purpose of this module is to allow you to make transactions without having to run and sync a full node
-
-Given the size of the blockchain and number of different networks, at a certain point of time it will become impossible for people to run the full sw for each one just to have their wallet synced and be able to send transactions
-
-And it is crazy to let wallet sw manage your keys
-
-Then even if the restart of this module was inspired by the epic bitcoin gold launch it is intended for the long term
-
-This is not coming from nowhere, neither a scam, you can read https://github.com/BTCGPU/BTCGPU/issues/238
-
-## Implementation and Code
-
-This module is using [elliptic](https://github.com/indutny/elliptic) and [bs58](https://github.com/cryptocoinjs/bs58)
-
-Please read the specific conditions of the license, the code is now unfortunately minified, the rationale for this is that people are constantly trying to cheat with the dev fees and this gives us additional work for each modification when using the code in clear, if you don't like the fees, don't use this module, and modifying anything can be quite dangerous
-
-### How to find my coins?
-
-It's not rare that the explorer of the forks are not working well, so you can use the legacy explorers to find your coins as explained [here](https://github.com/Ayms/bitcoin-transactions#claiming-your-coins-bchbtgbcdsbtccdyetc---addresses-and-getting-free-coins) or [here](https://bitcointalk.org/index.php?topic=2827163.msg31273044#msg31273044)
-
-You can also use [Find My Coins .ninja](http://www.findmycoins.ninja/) to get an overview of spendable coins
-
-## Fees
-
-Unlike bitcoin-cli this modules allows you to manage your fees too, do not go below ~1 satoshi per byte for the network fees or your transaction will not be accepted by the network
-
-There are development fees of ~6.25% (with a minimum of 0.00017000 and 12.5% for BTCP segwit) that are added to each transaction that you broadcast, of course the fees apply only when your broadcasted transaction to the network is included in a block, no fees apply to create/test your transactions
-
-If you don't like the dev fees then please do not use this module but please realize that you can adjust the network fees to compensate
-
-This module is not trivial at all, the bitcoin protocol and formats do not make things easy, it is not recommended (neither authorized by the license) to try to modify anything, if you send wrong transactions to the network at best you will be immediately banned by the nodes for one day and at worse you could send transactions that could spend your funds at a wrong place
-
-<b>Please note that due to rounding issues there is always a satoshi floating around that will go to the network, this is normal</b>
-
-Should this project be funded we will remove the dev fees and put it fully open source
-
-## Installation
-
-Install [nodejs for Windows,Mac,Linux](https://nodejs.org/en/download/package-manager/), usually this is easy
-
-Create a bitcoin-transactions directory, install elliptic and bs58 with npm in node-modules and copy tx.js
-
-Or just unzip [bitcoin-transactions.zip](http://www.peersm.com/bitcoin-transactions.zip) (137 kB)
-
-	For Windows users that are not used to the command line tools:
+	node tx.js <coin> verify <body of the transaction> 'outpoint1,nValue1' 'outpoint2,nValue2' ...
 	
-	Install nodejs using the above link
+Please see [verify](https://github.com/Ayms/bitcoin-transactions/blob/master/tests/verify.js)
 	
-	Unzip [bitcoin-transactions.zip](http://www.peersm.com/bitcoin-transactions.zip) somewhere (let's say C:/Users/Me)
+## Convert addresses
+
+	node tx.js <coin1> convert <coin2> <addr>
 	
-	[key Windows]+[X], then "execute" and enter cmd, this will open the console
+This will convert the address from coin1 format to coin2 format
+
+	node tx.js BTC convert BTG 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+
+	Type: p2pk
+	Address: GRkwZPwZbqtRsRgngzeWSiqUsesMkp6eB9
+	Segwit(nested): AcvpUaCnN7dZBkuf8qy6aZpF5GeBqdfKLg
+	Segwit(bech): bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
 	
-	cd /Users/Me/bitcoin-transactions
+	node tx.js BTC convert BTG 375tSX5mD7BbXusGrV5GaGuy4aDH9VR176
 	
-	Now you can enter the commands (please see below): node tx.js BTG create prevtx= prevaddr= prevamount= previndex= privkey= addr= fees= amount=
+	Type: p2sh
+	Address: AMAkAUSwzMXNFiNqJ351JXp8PerFzPbZmy
 
-## Use
-
-See [example-1.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-1.js), Bitcoin Gold transaction 118d6160c8ae2465835ad41908a154cd9be6c78ca4012f79edbf65ca96407f97 was created with this module and mined in block 501249, see https://btgexp.com/tx/118d6160c8ae2465835ad41908a154cd9be6c78ca4012f79edbf65ca96407f97
-
-Please note that the examples do not reflect the current dev fees
-
-#### Standard wallets
-
-[example-1.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-1.js) is now deprecated, please see [example-2.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-2.js) for the new format and transaction https://btgexp.com/tx/cc9684a4243999d1a1fc21c7ad7dbd1b3462bb1fb29614ed16b4d2763ab12bd4
-
-We will follow this transaction for our examples, the previous transaction was [d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206](https://btgexp.com/tx/d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206)
-
-#### Multisig wallets
-
-See [example-3.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-3.js) for "Two of two" and "Two of three" transactions examples
-
-And see [example-4.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-4.js) for a "Two of four" example
-
-Multisig transactions/wallets (and why it's a very bad idea to use them) is explained [here(TODO)]()
-
-#### Segwit
-
-Please see above
-
-### Important Warning
-
-While using this module if you make a mistake with the parameters the transaction might look valid but will just be rejected by the network, so there is no impact, <b>except if you make a mistake with the destination address, nobody can check this, then make sure that the destination address is one that you master</b>
-
-<b>If you have just as little as a slight shadow of a doubt while creating a transaction and looking at the outcome, please don't send it, email us or post an issue (WITHOUT YOUR PRIVATE KEYS)</b>
-
-<b>Before this, please do some work and check precisely what you did, common mistakes are related to wrong private keys and/or wrong redeem script or prevamount for multisig, or fees too low, or amount to be spent on a destination address too low (referenced as "dust" if below 546 Satoshis)</b>
-
-### Important - Understanding transactions
-
-In our example we are going to spend output 31 of transaction d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206 with a prevamount of 0.00998277 that belongs to us since GSjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo is one of our addresses, with 0.00001001 network fees
-
-``prevamount`` is like a bank note, you cannot cut it in half, give half to a merchant and keep the rest, you have to give the totality to the merchant (here the network) and get back the rest from him
-
-Here we can decide to spend the whole ``0.00998277`` amount or just a part
-
-In case we decide to spend a part, the delta will be refunded to our address GSjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo
-
-This is what we do in our example, where we have decided to spend 0.005 to a given address and will get back 0.00488776 on address GSjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo which corresponds to the total amount minus the dev and network fees ``0.00998277=0.005 + 0.00488776 + fees``
-
-The calculation is simply:
-
-	amount+dev fees+network fees=prevamount
+	node tx.js BTC convert BTG bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
 	
-But this is easy to make mistakes, then we have added the ``testamount`` feature which is recommended to use before using the ``create`` command where you explicity say how much network fees you want to pay
-
-Same applies for multisig transactions, the delta, if any, will be refunded to your multisig address as you can see in [example-3.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-3.js)
-
-### Setting/Checking your parameters
-
-#### You have decided to spend the whole amount with 0.0001001 fees and want to know what will be the amount (including dev fees) to put in the ``create`` command, do:
-
-	node tx.js BTG testamount prevamount=0.00998277 fees=0.00001001
+	Type: p2pk
+	Address: GRkwZPwZbqtRsRgngzeWSiqUsesMkp6eB9
+	Segwit(nested): AcvpUaCnN7dZBkuf8qy6aZpF5GeBqdfKLg
+	Segwit(bech): bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
 	
-	--- Prevamount is small, min dev fees of 8500 apply - amount should be 0.00988776
-
-Then you should use ``0.00988776`` in the ``amount`` parameter of the ``create`` command or use the ``create`` command without the ``amount`` parameter as explained in the "easy way" section above
-
-#### You have decided to spend 0.005 with 0.0001001 fees like example-2, do:
-
-	node tx.js BTG testamount prevamount=0.00998277 fees=0.00001001 amount=0.005
-
-	--- Previous amount is: 0.00998277
-	--- Amount to spend is: 0.00500000
-	--- Network fees are: 0.00001001
-	--- Dev fees are: 0.00008500
-	--- Refunded amount to spending address is: 0.00488776
+	node tx.js BTC convert BTG bc1qfun6tu3xkgqe0h7gcyjt036ew8n27p2nhl5ymuakcrjx0cu7a4nqqueq7n
 	
-You will spend 0.005, pay ``0.00001001+0.00008500`` as fees and get back 0.00488776 on your initial address
+	Type: p2sh
+	Segwit(nested): AWGBg1UmRQAekSFMZFkBeLDFbR7Z63S8ey
+	Segwit(bech): bc1qfun6tu3xkgqe0h7gcyjt036ew8n27p2nhl5ymuakcrjx0cu7a4nqqueq7n
 
-As you can see in [example-2.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-2.js) since the numbers are rounded and checked again by the ``create`` command there can be a the end a difference of 0.00000001 with that numbers as network fees
+	node2 tx.js BTC convert BCH bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
 
-For multisig wallets, that's the same and both examples can be seen in [example-3.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-3.js)
+	Type: p2pkh
+	Address: 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Segwit(nested): 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	Segwit(bech): bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	BCH bech: bitcoincash:qptvlc2kaldce5ztn90dpyk3dhq4md5qtc6jk64fjm
 
-### Create transactions
+	node tx.js BTC convert BCH 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
 
-Once the numbers are correct you can create your transaction:
+	Type: p2pkh
+	Address: 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Segwit(nested): 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	Segwit(bech): bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	BCH bech: bitcoincash:qptvlc2kaldce5ztn90dpyk3dhq4md5qtc6jk64fjm
 
-#### Standard wallets
+	node tx.js BTC convert ZEC 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
 
-`node tx.js BTG create prevtx=d5a80b216e5966790617dd3828bc13152bad82f121b16208496e9d718664e206 prevaddr=GSjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo prevamount=0.00998277 previndex=31 privkey=privkey addr=GKz5ii8tWQG9hd196vNkwkLKsWHqaeKSoB fees=0.00001001 amount=0.005 `
+	Type: p2pkh
+	Address: t1Rnd9c2kbK4jPbSPhUoX9mbWD9GbVzrhus
+	Segwit(nested): t3fiZkxFjZC5P4bSzdinUz81zzrCHpbMpx2
+	Segwit(bech): bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
 	
-	first argument (BTG here) is the network you want to use, please see the "supported coins" section above
-	prevtx is the previous transaction containing the output that you want to spend
-	prevaddr is the address where was sent the output that you want to spend (then one of yours)
-	prevamount is the amount of the output that you want to spend
-	previndex is the index of the output in the transaction
-	privkey is the private key of prevaddr as you can see it in your wallet.dat dump
-	addr is the address where to spend the output
-	amount is the amount the address will receive
-	fees are the network fees that you have decided to pay
-
-You can get all those information simply from a blockchain explorer, in case of a transaction with many outputs, to get the index of your output just copy/paste from the site and look at the line number for your output (<b>don't forget that it starts from 0, the first output index is 0 not 1</b>)
-
-If you don't know very well how to retrieve those parameters from an explorer, please see:
-
-![tuto1](https://raw.github.com/Ayms/bitcoin-transactions/master/tuto1.png)
-![tuto2](https://raw.github.com/Ayms/bitcoin-transactions/master/tuto2.png)
-
-#### Specific case of BCD
-
-One BTC will become 10 BCDs, it just means that amount, prevamount and fees are multiplied by 10, then they have now 7 decimals instead of 8 (so amount, prevamount or fees of 0.00001234 become 0.0001234 in the create command)
-
-This is just a marketing representation and does not change anything else, please see [example-6.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-6.js) that you can compare with [example-2.js](https://github.com/Ayms/bitcoin-transactions/blob/master/example-2.js)
-
-You can claim your coins using a BTC explorer and standard BTC addresses (starting with a 1 or 3)
-
-Read also [Claiming your coins (BCH, BTG, BCD,CDY,etc) - Adresses and getting "free" coins](https://github.com/Ayms/bitcoin-transactions#claiming-your-coins-bchbtgbcdsbtccdyetc---addresses-and-getting-free-coins)
-
-
-#### Specific case of BCH
-
-The BCH address format did change recently, this does not really make any difference for this module but we have updated the address format with the very excellent [cashaddress](https://github.com/Ayms/cashaddress) module
-
-Then legacy and new format can be used
-
-See also [BCH addresses converter](https://cashaddr.bitcoincash.org/)
-
-#### Specific case of CDY
-
-One BCH will become 1000 CDYs, it just means that amount, prevamount and fees are multiplied by 1000, then they have now 5 decimals instead of 8 (so amount, prevamount or fees of 0.00001234 become 0.01234 in the create command)
-
-This is just a marketing representation and does not change anything else, please see [cdy.js](https://github.com/Ayms/bitcoin-transactions/blob/master/cdy.js)
-
-You can claim your coins using a BCH explorer and standard BCH addresses (starting with a 1 or 3), you will see in the output of the create command that they are converted to the CDY format (addresses are the same in fact, only the representation changes between both networks)
-
-Read also [Claiming your coins (BCH, BTG, BCD,CDY,etc) - Adresses and getting "free" coins](https://github.com/Ayms/bitcoin-transactions#claiming-your-coins-bchbtgbcdsbtccdyetc---addresses-and-getting-free-coins)
-
-#### Multisig wallets
-
-`node tx.js BTG create prevtx= prevaddr= prevamount= previndex= privkey=priv1-priv2-redeem-<2of2 or 2of3 or 2of4> addr= fee= amount=(optional)`
-
-The arguments are the same than before except privkey where priv1 and priv2 are the two private keys required to spend your coins on your multisig address, redeem is the redeem script, 2of2 or 2of3 or 2of4 is the multisig scheme corresponding to your address
-
-To find what are the public keys included in the redeem script, please run:
-
-	node tx.js BTG decoderedeem <redeem>
+	node tx.js BCH convert BTG bitcoincash:qptvlc2kaldce5ztn90dpyk3dhq4md5qtc6jk64fjm
 	
-	Public Key: GLU1deMwMToTt7s87Nv98v9qrK2sbZML5k equivalent to bitcoin address 13d6DX2zNcCAoeZqBSG2i9oww9F2bvd82o
-	Public Key: GLbb8AJPnpbwaFxHJAH6UggaB6e4u1CtFQ equivalent to bitcoin address 13kfi2ySoxzeVnezNDcz3vLgFvrDrpL1qW
-	Public Key: GSjwHAAYmFfQ4WPArc2ErtjQGr3Q2nkjvo equivalent to bitcoin address 19u1s2qbnQ46z35svfN8S8PWMgFZ1vqpxz
-
-Then you need to find at least two private keys corresponding to two of those public keys, to retrieve them (and the redeem script first) from your wallet, you can look at the first part of this tutorial [How to extract Bitcoin Gold from a 2fa Electrum Wallet [STEP BY STEP]](https://bitcointalk.org/index.php?topic=2550529.0) but of course you don't need to run a full node
-
-This can look complicate but is not so much
+	Type: p2pkh
+	Address: GRkwZPwZbqtRsRgngzeWSiqUsesMkp6eB9
+	Segwit(nested): AcvpUaCnN7dZBkuf8qy6aZpF5GeBqdfKLg
+	Segwit(bech): bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
 	
-You will get a summary of everything at the end of the command and warnings if the numbers are not correct, the ``create`` command does check the transaction again after it has been created, <b>you must get at the end the message 'Transaction verified', if not something went wrong</b>
-
-Most likely if you get 'Bad transaction' this is because you made a mistake with the private key(s) and/or the redeem script or prevamount in case of multisig, or you are trying to spend something that does not belong to you, if this happens and everything looks correct, please report (<b>but never send to us/advertise your private keys, remove them and post the logs</b>)
-
-### Decode transaction
-
-It's a good idea to check again your transaction once it has been created, use the ``transaction body``
-
-`node tx.js BTG decode 020000000106e26486719d6e490862b121f182ad2b1513bc2838dd17067966596e210ba8d51f0000006a473044022039e2eee9a14fd18665eceeaac8af87888704ef2bfa14afe850b850e6fc7fdea702201d3c4340cc6998738295176320dc2597b3b6fcb93abc01add17b57b9ea70f0754121039f1e160a02079a6d6b7be0334cc4d76a125cd13a6f8d7131b11c263bc20bf918ffffffff0320a10700000000001976a914177b585b5401ad21b60b78b1b3c91996f250296d88ac47750700000000001976a91461975b3a4b9d5059e3db3e301e394d6d13275b3688ac34210000000000001976a9145b79a9d29a34f2f284ecdd33009ffa5e0252b68988ac00000000`
+	node tx.js BTC convert BCH 375tSX5mD7BbXusGrV5GaGuy4aDH9VR176
 	
-If you want you can double check again using something else like bitcoin-cli
-
-### Send your transaction
-
-Once you are sure that everything is correct, you can send your transaction to the network using the ``complete transaction``:
-
-`node tx.js BTG send e1476d4474780000000000000000000003010000d42bb13a020000000106e26486719d6e490862b121f182ad2b1513bc2838dd17067966596e210ba8d51f0000006a473044022039e2eee9a14fd18665eceeaac8af87888704ef2bfa14afe850b850e6fc7fdea702201d3c4340cc6998738295176320dc2597b3b6fcb93abc01add17b57b9ea70f0754121039f1e160a02079a6d6b7be0334cc4d76a125cd13a6f8d7131b11c263bc20bf918ffffffff0320a10700000000001976a914177b585b5401ad21b60b78b1b3c91996f250296d88ac47750700000000001976a91461975b3a4b9d5059e3db3e301e394d6d13275b3688ac34210000000000001976a9145b79a9d29a34f2f284ecdd33009ffa5e0252b68988ac00000000`
+	Type: p2sh
+	Address: 375tSX5mD7BbXusGrV5GaGuy4aDH9VR176
+	BCH bech: bitcoincash:pqajhuctcwsmjugrlnv2tn6w7sn2fug7uqvzsme2g0
 	
-Some addresses of nodes are hard coded, they don't belong to us and we can't say how long they will work, so if you want to use a specific node, do ``node tx.js BTG send <tx> A.B.C.D`` where A.B.C.D is the IP address of the node (please see the recommended full nodes [above](https://github.com/Ayms/bitcoin-transactions#supported-coins))
-
-Before sending your transaction it's a good idea too to check the network by doing ``node tx.js BTG testconnect`` or ``node tx.js BTG testconnect A.B.C.D``
+	node tx.js BCH convert BTG pqajhuctcwsmjugrlnv2tn6w7sn2fug7uqvzsme2g0
 	
-A more easy way if available for your network is to copy and paste the ``body of the transaction`` (and not the ``complete transaction``) to a blockchain explorer that will broadcast it, there are no risks of doing this except that you don't know if the explorer will do its job, the explorer can't modify the transaction
+	Type: p2sh
+	Address: AMAkAUSwzMXNFiNqJ351JXp8PerFzPbZmy
 
-## Claiming your coins (BCH,BTG,BCD,SBTC,CDY,etc) - Addresses and getting 'free' coins
+## Decode redeem scripts
 
-The addresses between the different networks are the same, it always ends up with the hash of your public key and is encoded in a specficic way for each network, but they still are the same
+To find the keys corresponding to a m of n redeem script, you can run:
 
-There are some tools existing to convert addresses, you might consider using the very excellent [Ayms/bitcoin-wallets](https://github.com/Ayms/bitcoin-wallets) module to create your wallet and/or convert addresses
+	node tx.js <coin> decoderedeem <redeem>
 	
-This module is not intended to push you to get your 'free' coins from bitcoin core (or other legacy network)
+	node tx.js BTG decoderedeem 5521038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb2102fe49b9e7ad51e1bcd4ab5a76dbf4a03d2205a3dc3051494290368a9aa968dd2d2103e3c30f4d2bfcc8e9f8e5268e6f3d0f6faa539fc57600661a607b6db0daabb28921030f56f89e8c20c4b46c3101d13fd8fe5a47dafbdfbd44dbd49cd91dc5aac5c1782102636f4cf63a1f404d3d3b64084bd61a0c9fff47ee84f950492ff87df209c0a04321031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d21031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d57ae
 	
-Because, unlike many people think, you have them already so there is no need to rush to 'convert' them (unless you want to send them quickly to an exchange to sell them), many people did not get their 'free' coins and just lost all what they had by using malware wallets
+	Version BTG
+	multisig 5 of 7
+	Public Key: GRkwZPwZbqtRsRgngzeWSiqUsesMkp6eB9 equivalent to bitcoin address 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Public Key: GSaHPVGrp9YoRWinY1Q61xprkefodKoFxA equivalent to bitcoin address 19jMyMwuqHwWM3RVc4jybCUxqUsxXbvgCk
+	Public Key: GW8VJYLzotvY2atK1aJPgcEsRj2tqmBbV2 equivalent to bitcoin address 1DHZtR23q3KEx7b25deHFqtyWZF3qhqYPs
+	Public Key: GNBSiteDiXTHSF39qN8y652DrV3zw5Bg3z equivalent to bitcoin address 15LXJmKGjfqzMmjruRUrfJgKwKG9sLoq8V
+	Public Key: GYkbaVWVpeEgSeH9F5vMHskKBQi7cDeazC equivalent to bitcoin address 1FugANBYqndPNAyrK9GEs7QRGEvGZhm5Qj
+	Public Key: GUWjpVpYzrWUs84aTVR2RmjJyjDncoZf4x equivalent to bitcoin address 1BfpQNVc1zuBnemHXYkv11PR4ZRwdPBPgZ
+	Public Key: GUWjpVpYzrWUs84aTVR2RmjJyjDncoZf4x equivalent to bitcoin address 1BfpQNVc1zuBnemHXYkv11PR4ZRwdPBPgZ
+	To use the create command and to spend your multisig transaction you must find at least 5 private keys associated to those public keys
+	P2SH address AMAkAUSwzMXNFiNqJ351JXp8PerFzPbZmy equivalent to bitcoin address 375tSX5mD7BbXusGrV5GaGuy4aDH9VR176
+	P2WSH (nested) address AWGBg1UmRQAekSFMZFkBeLDFbR7Z63S8ey equivalent to bitcoin address 3GBKx47ae9pt2djo7hkSv5K6GLUaL6Vwvm
+	P2WSH address bc1qfun6tu3xkgqe0h7gcyjt036ew8n27p2nhl5ymuakcrjx0cu7a4nqqueq7n
 
-That's why, even if there are zero technical reason for doing this, it is highly advised to transfer first your bitcoins (or legacy coins) to another wallet before moving/claiming forked coins
+## Create redeem scripts
 
-Another advantage of doing so is that <b>it becomes easier to get your parameters to claim your coins (like the redeem script in case of multisig address, or the address corresponding to your segwit address), indeed we can see them on the transactions made on the legacy network to move your coins</b>
+	node tx.js <coin> createredeemfrompub <m> pub1-pub2-pub3...
 	
-If you want to move your bitcoins "from bitcoin core to BCH, BTG, BCD or SBTC, etc" or from "bitcoin core to a bitcoin X exchange", you can just use the ``create`` command:
+	node2 tx.js BTG createredeemfrompub 5 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb-02fe49b9e7ad51e1bcd4ab5a76dbf4a03d2205a3dc3051494290368a9aa968dd2d-03e3c30f4d2bfcc8e9f8e5268e6f3d0f6faa539fc57600661a607b6db0daabb289-030f56f89e8c20c4b46c3101d13fd8fe5a47dafbdfbd44dbd49cd91dc5aac5c178-02636f4cf63a1f404d3d3b64084bd61a0c9fff47ee84f950492ff87df209c0a043-031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d-031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d
 	
-`node tx.js BTG create prevtx= prevaddr= prevamount= previndex= privkey=privkey addr= fees= amount=(optional)`
-
-or
-
-`node tx.js BTG create prevtx= prevaddr= prevamount= previndex= privkey=priv1-priv2-redeem-<2of2 or 2of3 or 2of4> addr= fee= amount=(optional)`
-
-<b>where prev[tx,addr,amount,index] refers very exactly to the same that you can see in a bitcoin core explorer (or the legacy explorer of the network being forked) like https://blockchain.info before the block forking height (same transaction id, same address, same amount, same index) and privkey is the private key corresponding to your bitcoin core address or priv1-priv2-redeem corresponds to your multisig bitcoin address</b>
+	Redeem script: 5521038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb2102fe49b9e7ad51e1bcd4ab5a76dbf4a03d2205a3dc3051494290368a9aa968dd2d2103e3c30f4d2bfcc8e9f8e5268e6f3d0f6faa539fc57600661a607b6db0daabb28921030f56f89e8c20c4b46c3101d13fd8fe5a47dafbdfbd44dbd49cd91dc5aac5c1782102636f4cf63a1f404d3d3b64084bd61a0c9fff47ee84f950492ff87df209c0a04321031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d21031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d57ae
+	Address: AMAkAUSwzMXNFiNqJ351JXp8PerFzPbZmy
+	Segwit (nested): AWGBg1UmRQAekSFMZFkBeLDFbR7Z63S8ey
+	Segwit (bech32): bc1qfun6tu3xkgqe0h7gcyjt036ew8n27p2nhl5ymuakcrjx0cu7a4nqqueq7n
 	
-and <b>addr can be a bitcoin address too that will be converted into a BCH, BTG, BCD, etc address as you will see in the output of the command (even if most likely you will use a destination address corresponding to the fork, which of course works also), as well as prevaddr, so you don't need to convert the addresses, the tool will do it for you</b>
+	node tx.js BCH createredeemfrompub 5 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb-02fe49b9e7ad51e1bcd4ab5a76dbf4a03d2205a3dc3051494290368a9aa968dd2d-03e3c30f4d2bfcc8e9f8e5268e6f3d0f6faa539fc57600661a607b6db0daabb289-030f56f89e8c20c4b46c3101d13fd8fe5a47dafbdfbd44dbd49cd91dc5aac5c178-02636f4cf63a1f404d3d3b64084bd61a0c9fff47ee84f950492ff87df209c0a043-031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d-031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d
+
+	Redeem script: 5521038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb2102fe49b9e7ad51e1bcd4ab5a76dbf4a03d2205a3dc3051494290368a9aa968dd2d2103e3c30f4d2bfcc8e9f8e5268e6f3d0f6faa539fc57600661a607b6db0daabb28921030f56f89e8c20c4b46c3101d13fd8fe5a47dafbdfbd44dbd49cd91dc5aac5c1782102636f4cf63a1f404d3d3b64084bd61a0c9fff47ee84f950492ff87df209c0a04321031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d21031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d57ae
+	Address: 375tSX5mD7BbXusGrV5GaGuy4aDH9VR176
+	Segwit (nested): 3GBKx47ae9pt2djo7hkSv5K6GLUaL6Vwvm
+	Segwit (bech32): bc1qfun6tu3xkgqe0h7gcyjt036ew8n27p2nhl5ymuakcrjx0cu7a4nqqueq7n
+	BCH bech: bitcoincash:pqajhuctcwsmjugrlnv2tn6w7sn2fug7uqvzsme2g0
+
+Probably of no use except for testing purposes:	
+
+	node tx.js <coin> createredeem <m> priv1-priv2-priv3...
 	
-You can convert before if you like the prevaddr and addr from a bitcoin core one to a bitcoin gold one but this is of no use, the create command will work with the original bitcoin addresses
+	node tx.js BTG createredeem 5 Kyib9iMhJxL6Zh1srtz3caTAqXhP5gsETuUBiQZEmFBrU3KAkiAg-L5Wn7mijns7mmH7GHfy2qRY9dwHDhTZ7MVW1HfpWMQxtKLseFEu2-L3EqabcHM2Fmp9odX7NSj8sKfZp4C9f1FNCkywMWK7FoPApuyfZF-KxNnFgNR5JVxZmiLrBCCEzB9g3cZU4Jx9PuYn1hLUtbm22PBNvtM-L3zqniBtFP9y41Pd8LbST99QpwWokdZd5J5aVfamnPKAfBqAta8y-L4m4szR86cinah7ttR62FTLFK2sfAgehiYGXzHbFYmxhmNBY9oJw-L4m4szR86cinah7ttR62FTLFK2sfAgehiYGXzHbFYmxhmNBY9oJw
+	
+	Redeem script: 5521038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb2102fe49b9e7ad51e1bcd4ab5a76dbf4a03d2205a3dc3051494290368a9aa968dd2d2103e3c30f4d2bfcc8e9f8e5268e6f3d0f6faa539fc57600661a607b6db0daabb28921030f56f89e8c20c4b46c3101d13fd8fe5a47dafbdfbd44dbd49cd91dc5aac5c1782102636f4cf63a1f404d3d3b64084bd61a0c9fff47ee84f950492ff87df209c0a04321031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d21031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d57ae
+	Address: AMAkAUSwzMXNFiNqJ351JXp8PerFzPbZmy
+	Segwit (nested): AWGBg1UmRQAekSFMZFkBeLDFbR7Z63S8ey
+	Segwit (bech32): bc1qfun6tu3xkgqe0h7gcyjt036ew8n27p2nhl5ymuakcrjx0cu7a4nqqueq7n
 
-If this explanation is unclear, please see the examples given [here](https://github.com/BTCGPU/BTCGPU/issues/213#issuecomment-350449253) or [here](https://bitcointalk.org/index.php?topic=2827163.msg31273044#msg31273044)
+	node tx.js BCH createredeem 5 Kyib9iMhJxL6Zh1srtz3caTAqXhP5gsETuUBiQZEmFBrU3KAkiAg-L5Wn7mijns7mmH7GHfy2qRY9dwHDhTZ7MVW1HfpWMQxtKLseFEu2-L3EqabcHM2Fmp9odX7NSj8sKfZp4C9f1FNCkywMWK7FoPApuyfZF-KxNnFgNR5JVxZmiLrBCCEzB9g3cZU4Jx9PuYn1hLUtbm22PBNvtM-L3zqniBtFP9y41Pd8LbST99QpwWokdZd5J5aVfamnPKAfBqAta8y-L4m4szR86cinah7ttR62FTLFK2sfAgehiYGXzHbFYmxhmNBY9oJw-L4m4szR86cinah7ttR62FTLFK2sfAgehiYGXzHbFYmxhmNBY9oJw
+	
+	Redeem script: 5521038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb2102fe49b9e7ad51e1bcd4ab5a76dbf4a03d2205a3dc3051494290368a9aa968dd2d2103e3c30f4d2bfcc8e9f8e5268e6f3d0f6faa539fc57600661a607b6db0daabb28921030f56f89e8c20c4b46c3101d13fd8fe5a47dafbdfbd44dbd49cd91dc5aac5c1782102636f4cf63a1f404d3d3b64084bd61a0c9fff47ee84f950492ff87df209c0a04321031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d21031fd4c6eab8efffeae088109fe450b50f5d30476e5a82925be4b7cb624eb5406d57ae
+	Address: 375tSX5mD7BbXusGrV5GaGuy4aDH9VR176
+	Segwit (nested): 3GBKx47ae9pt2djo7hkSv5K6GLUaL6Vwvm
+	Segwit (bech32): bc1qfun6tu3xkgqe0h7gcyjt036ew8n27p2nhl5ymuakcrjx0cu7a4nqqueq7n
+	BCH bech: bitcoincash:pqajhuctcwsmjugrlnv2tn6w7sn2fug7uqvzsme2g0
+	
+## BIP32,39,44,49,84,141
 
-## Double check again
+Short summary:
 
-If for any reason you don't trust this project then it's easy to use bitcoin-cli to check that the transactions are correct, especially ``decoderawtransaction`` and ``signrawtransaction`` using the body of the transaction to compare the output and the signatures
+- BIP32: defines how to derive P2PK keys from a 32 bytes seed according to a path (see createwallet above)
 
-## Multiple inputs
+- BIP39: allows you to derive a seed from n words (where n is a multiple of 3) chosen from a list, there is a non mandatory checksum but probably enforced by every wallets, the seed is derived first according to BIP32, then derived from the path chosen
 
-`node tx.js BTG create prevtx=tx1_tx2_..._txn prevaddr=addr1_addr2_..._addrn prevamount=amount1_amount2_..._amountn previndex=index1_index2_..._indexn privkey=privkey1_privkey2_..._privkeyn addr=<destination address> fees=0.00000600`
+- BIP44: defines the path to derive a BIP39 seed for each coin
 
-You can put the ``amount=`` parameter (but we believe that it's quite stupid even if included in our examples), then the delta will be refunded to addr1
+- BIP49: defines the path to derive a BIP39 seed to segwit nested addresses for each coin
 
-To simplify, if prevaddr and/or index are always the same (and why not amount), you can do:
+- BIP84: defines the path to derive a BIP39 seed to bech32 addresses for each coin
 
-`node tx.js BTG create prevtx=tx1_tx2_..._txn prevaddr=addr1 prevamount=amount1_amount2_..._amountn previndex=index1 privkey=privkey1 addr=<destination address> fees=0.00000600`
+- BIP141: segwit specs
 
-or
+The legacy derivation path `m/0'/0'/0'` defined by bitcoin core is used by default for BIP32 and BIP141, use the 'bip44' tag to change it to bip44 path
 
-`node tx.js BTG create prevtx=tx1_tx2_..._txn prevaddr=addr1 prevamount=amount1 previndex=index1 privkey=privkey1 addr=<destination address> fees=0.00000600`
+See the test vectors in [BIPs](https://github.com/Ayms/bitcoin-transactions/blob/master/tests/test_bip39.js)
 
-### Multisig wallets
+### BIP39 seed
 
-This works the same `privkey=privkey1_privkey2_..._privkeyn` where each privkeyi is priv1-priv2-redeem-<2of2 or 2of3 or 2of4>
+	node tx.js <coin> bip39 <language> <words> <optional (will default to legacy for BTC and bip44 for others):bip44/49/84/141>
 
-You can mix standard inputs and multisig ones, see all the examples in [multiinputs.js](https://github.com/Ayms/bitcoin-transactions/blob/master/multiinputs.js)
+	node tx.js BTC bip39 english "evidence ripple can refuse organ original peasant camp bar train similar scatter prepare follow meadow" bip49
 
-Don't forget to adjust the fees according to the size of your transaction
+	Version BTC
+	Seed: b93f5a19c1701859611f5b23b5d87856386f7e3864bfceb3d2dd8327ea00bfbffad7fc5dfbd9f0a25b0f4778448ae9942dcfe97f113602313e40624b1ce1e423
+	Root key: yprvABrGsX5C9januSgBRoJ6oFWCixUtcLgGagTZK5gARswdD5gCEEioddiUHutTvY6q57bKjPnBVS54R8vbw6HEgqpWW4bMEWyu6a3ega5n37y
+	Valid checksum: Yes
 
-<b>This has not been extensively tested for now even if we are confident that this is working well, so please check very closely the outcome before sending the transaction, most likely it will only be rejected if there is an issue but again check the destination addresses</b>
+### BIP39 wallets
 
-## License
+	node tx.js <coin> createbip39wallet <words or extended private key> <language or null>  <optional (will default to legacy for BTC and bip44 for others):bip44/49/84/141> <optional - number of addresses> <optional - custom path>
+	
+	Examples:
+	
+	node tx.js BTC createbip39wallet "evidence ripple can refuse organ original peasant camp bar train similar scatter prepare follow meadow" english
 
-This module is subject to the following modified MIT license which removes the rights to modify, merge, sublicense, and sell:
+	Seed: b93f5a19c1701859611f5b23b5d87856386f7e3864bfceb3d2dd8327ea00bfbffad7fc5dfbd9f0a25b0f4778448ae9942dcfe97f113602313e40624b1ce1e423
+	Root key: xprv9s21ZrQH143K49V4bSWUbAQhYzLSfigmfZwLXgnH3sZk9yrxyaZF1a4LGhvsvdSufUUWyvBd2miWXrK3DPsDtc8uditvecAQpqz1Hy2sYwq
+	Valid checksum: Yes
+	# extended private masterkey: xprv9s21ZrQH143K49V4bSWUbAQhYzLSfigmfZwLXgnH3sZk9yrxyaZF1a4LGhvsvdSufUUWyvBd2miWXrK3DPsDtc8uditvecAQpqz1Hy2sYwq
+	L4ANvvMfS7ux4SJGoLPMxFD5Hh5PTE3Zm2gzfA7WDi8Gmmu43bY3 2019-07-13T19:02:51.700Z label= # addr=19NRnfG6CJUxSxkVrwjC2rZi9ruFU3b1C6 hdkeypath=m/0'/0'/0'
+	KxV6EiYtBmgv8kcoL92F1dx36jTGLZmTMGuJ8siEkYXyw1NJehpD 2019-07-13T19:02:51.700Z reserve=1 # addr=1C7eBnr52uHsKZG4etZvbTvYgvRY5qtmVD hdkeypath=m/0'/0'/1'
+	KxMKjtJY3NQzQo1EtGJKMEBg4nmh7zgNayCQZ4itqsPVifCbGCnV 2019-07-13T19:02:51.700Z reserve=1 # addr=1NdJ346ojWupuQMc134CG2MsPzLseQrw97 hdkeypath=m/0'/0'/2'
+	
+	node tx.js BTC createbip39wallet "evidence ripple can refuse organ original peasant camp bar train similar scatter prepare follow meadow" english bip141
+	
+	# extended private masterkey: yprvABrGsX5C9januSgBRoJ6oFWCixUtcLgGagTZK5gARswdD5gCEEioddiUHutTvY6q57bKjPnBVS54R8vbw6HEgqpWW4bMEWyu6a3ega5n37y
+	L4ANvvMfS7ux4SJGoLPMxFD5Hh5PTE3Zm2gzfA7WDi8Gmmu43bY3 2019-07-09T17:41:05.631Z label= # addr=3GYpJFyGCGReBy1uZCuzxrvxWNxFzXhNq9 hdkeypath=m/0'/0'/0'
+	KxV6EiYtBmgv8kcoL92F1dx36jTGLZmTMGuJ8siEkYXyw1NJehpD 2019-07-09T17:41:05.631Z reserve=1 # addr=3QdLvwr2hZLgtDijEi2v52uR6fw6rudwLj hdkeypath=m/0'/0'/1'
+	KxMKjtJY3NQzQo1EtGJKMEBg4nmh7zgNayCQZ4itqsPVifCbGCnV 2019-07-09T17:41:05.631Z reserve=1 # addr=35WC7bMssH6VY7czcYgVPMghqPtm6DcxWv hdkeypath=m/0'/0'/2'
+	
+	node tx.js BTG createbip39wallet xprv9s21ZrQH143K49V4bSWUbAQhYzLSfigmfZwLXgnH3sZk9yrxyaZF1a4LGhvsvdSufUUWyvBd2miWXrK3DPsDtc8uditvecAQpqz1Hy2sYwq null bip49
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, publish, and/or distribute copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+	# extended private masterkey: yprvABrGsX5C9januSgBRoJ6oFWCixUtcLgGagTZK5gARswdD5gCEEioddiUHutTvY6q57bKjPnBVS54R8vbw6HEgqpWW4bMEWyu6a3ega5n37y
+	L52DFviYti9soWsJC5vfu47fNfBvN1isQETjhYYz2wbaoeQVta4K 2019-07-09T17:45:53.253Z label= # addr=AXepuY6uMUiwndcUfX8aDWKaP9yQ8DMXPF hdkeypath=m/49'/156'/0'/0/0
+	L2dphVFbPGGiGHK4fsfDXUKkVqH54rky6LP6xjDwNcsJyYshfGmV 2019-07-09T17:45:53.253Z reserve=1 # addr=AZs6TgM8F6G8XgnmET6PwPiDo66LWhjDLB hdkeypath=m/49'/156'/0'/0/1
+	L3oBxwnJpWRq16VzxNAyCG4YcZeHqDPTck2U49C1kzHxwPEEYsg8 2019-07-09T17:45:53.253Z reserve=1 # addr=AcZCua2cve6sfBzvbq87zebebavrimqY34 hdkeypath=m/49'/156'/0'/0/2
+	
+	node tx.js BTC createbip39wallet xprv9s21ZrQH143K49V4bSWUbAQhYzLSfigmfZwLXgnH3sZk9yrxyaZF1a4LGhvsvdSufUUWyvBd2miWXrK3DPsDtc8uditvecAQpqz1Hy2sYwq null bip84 50 "m/4800'/1'/2'/500"
+	
+	# extended private masterkey: zprvAWgYBBk7JR8GkjsJGA5j1LbhtvdLYxfmVnyn6Ua3otKWGBVRUttNFhNcK7r3vSkkUki8UsNjx6RcJRYAenhFV5W7NQHmpRoPNJ7J55jxDjE
+	L4RhkBeBBc7Nt5f8cr1GxuaTWZirEUiC9UsmWDWvSj57BdQTSRzD 2019-07-09T21:07:07.764Z label= # addr=bc1qvhtt3ygh00gmm5dcp6q4agk7ygus0ry2f36mf7 hdkeypath=m/4800'/1'/2'/500
+	KyeGs21U4iSwfcpXJWdq6enZ1PMvKianbZUfi7iiCGnrqmXJAd2m 2019-07-09T21:07:07.764Z reserve=1 # addr=bc1q3z2jvq992p8tqye3fhqr5wyrashav3as659suu hdkeypath=m/4800'/1'/2'/501
+	L318UpxtT6suNgbvWeqoRjDUZY2RfdQ3q1JaYVPyReDZz8fzCEJk 2019-07-09T21:07:07.764Z reserve=1 # addr=bc1qww9dn84frhfae99v73cu3trf3429lk58cp4dkv hdkeypath=m/4800'/1'/2'/502
+	
+	node tx.js BTC createbip39wallet zprvAWgYBBk7JR8GkjsJGA5j1LbhtvdLYxfmVnyn6Ua3otKWGBVRUttNFhNcK7r3vSkkUki8UsNjx6RcJRYAenhFV5W7NQHmpRoPNJ7J55jxDjE null bip84 50 "m/4800'/1'/2'/500"
+	
+	# extended private masterkey: zprvAWgYBBk7JR8GkjsJGA5j1LbhtvdLYxfmVnyn6Ua3otKWGBVRUttNFhNcK7r3vSkkUki8UsNjx6RcJRYAenhFV5W7NQHmpRoPNJ7J55jxDjE
+	L4RhkBeBBc7Nt5f8cr1GxuaTWZirEUiC9UsmWDWvSj57BdQTSRzD 2019-07-09T21:15:29.935Z label= # addr=bc1qvhtt3ygh00gmm5dcp6q4agk7ygus0ry2f36mf7 hdkeypath=m/4800'/1'/2'/500
+	KyeGs21U4iSwfcpXJWdq6enZ1PMvKianbZUfi7iiCGnrqmXJAd2m 2019-07-09T21:15:29.935Z reserve=1 # addr=bc1q3z2jvq992p8tqye3fhqr5wyrashav3as659suu hdkeypath=m/4800'/1'/2'/501
+	L318UpxtT6suNgbvWeqoRjDUZY2RfdQ3q1JaYVPyReDZz8fzCEJk 2019-07-09T21:15:29.935Z reserve=1 # addr=bc1qww9dn84frhfae99v73cu3trf3429lk58cp4dkv hdkeypath=m/4800'/1'/2'/502
+	
+### BIP39 words recovery
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The tool allows you to recover one or two words in a BIP39 sequence in case you lost them (or to get the right words to have a correct checksum), two words still makes too many possibilities so most likely you should use this feature with only one word
+	
+	node tx.js <coin> recoverbip39 <language> <words> <m> <n optional>
+	
+m is the position of the first missing word, n the one of the second one (if relevant)
+	
+	node tx.js BTC recoverbip39 english "evidence ripple refuse organ original peasant camp bar train similar scatter prepare follow meadow" 3
+	
+	evidence ripple absent refuse organ original peasant camp bar train similar scatter prepare follow meadow
+	evidence ripple adapt refuse organ original peasant camp bar train similar scatter prepare follow meadow
+	evidence ripple answer refuse organ original peasant camp bar train similar scatter prepare follow meadow
+	evidence ripple apology refuse organ original peasant camp bar train similar scatter prepare follow meadow
+	...
+	
+### BIP39 seeds generation
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+We do not advise to use this feature since javascript prng still can be weak, instead we would recommend to use a BIP32 seed from for example [QRNG](http://qrng.anu.edu.au/) go to Live Numbers-->Live streams-->Hex and copy 64 digits (ie a 32B hex seed)
+
+	node tx.js <coin> generatebip39 <language> <nb>
+	
+nb is the number of words
+	
+	node tx.js BTC generatebip39 english 15
+	
+	wrong history this yard mass agree glove matter notable arrive cabin shell leisure test anger
+
+## Get public key from private
+
+	node tx.js BTC getpubfromprivate <32B private key or WIF string>
+	
+	node tx.js BTC getpubfromprivate 4a87f69e181ee018da08ecdb9eea6ac45841070c1863aba37a60a7e33b95dd6f
+
+	Pubkey: 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	Address: 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Segwit nested: 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	Segwit bech32: bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	Hash160: 56cfe156efdb8cd04b995ed092d16dc15db6805e
+	
+	node tx.js BCH getpubfromprivate Kyib9iMhJxL6Zh1srtz3caTAqXhP5gsETuUBiQZEmFBrU3KAkiAg
+	
+	Pubkey: 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	Address: 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Segwit nested: 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	Segwit bech32: bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	Hash160: 56cfe156efdb8cd04b995ed092d16dc15db6805e
+	BCH bech: bitcoincash:qptvlc2kaldce5ztn90dpyk3dhq4md5qtc6jk64fjm
+
+## Get private from WIF and vice-versa
+
+	node tx.js BTC getprivfromwif Kyib9iMhJxL6Zh1srtz3caTAqXhP5gsETuUBiQZEmFBrU3KAkiAg
+	Priv: 4a87f69e181ee018da08ecdb9eea6ac45841070c1863aba37a60a7e33b95dd6f
+	
+	node tx.js BTC privtowif 4a87f69e181ee018da08ecdb9eea6ac45841070c1863aba37a60a7e33b95dd6f
+	WIF Priv: Kyib9iMhJxL6Zh1srtz3caTAqXhP5gsETuUBiQZEmFBrU3KAkiAg
+
+## Public to addresses and hash
+	
+	node tx.js BTC pubtoaddress 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	
+	Pubkey: 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	Address: 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Segwit nested: 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	Segwit bech32: bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	Hash160: 56cfe156efdb8cd04b995ed092d16dc15db6805e
+	
+	node tx.js BTC pubtoaddress 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	
+	Address: 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Segwit nested: 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	Segwit bech32: bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	Hash160: 56cfe156efdb8cd04b995ed092d16dc15db6805e
+
+	node tx.js BCH pubtoaddress 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	
+	Address: 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+	Segwit nested: 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	Segwit bech32: bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	Hash160: 56cfe156efdb8cd04b995ed092d16dc15db6805e
+	BCH bech: bitcoincash:qptvlc2kaldce5ztn90dpyk3dhq4md5qtc6jk64fjm
+
+## Sign/Verify messages
+
+This is used to prove ownership of a given address
+
+Be careful anyway not to over use it, or do it privately, because once you have proven the ownership of a given address, then the corresponding public key becomes public, see decode transactions above
+
+Each coin uses a prefix appended to the message to be signed (generally the string 'Bitcoin signed message:\n'), we have set the correct prefix for the main coins but did not check for all of them
+	
+	node tx.js <coin> signmessage <message> <privatekey> <type>
+	
+	type is: 'n' for compressed key, 's' for segwit, 'b' for bech32
+	
+	type is in fact of no use and not relevant for this module, therefore ignored by verify (but set correctly for signing), but it can be checked by other tools
+	
+	node tx.js BTC signmessage 'Thanks Ayms this module is great!' Kyib9iMhJxL6Zh1srtz3caTAqXhP5gsETuUBiQZEmFBrU3KAkiAg n
+	
+	Signature : Hw/PE+L4GW8C4S+V/6rgDZx9UHHU8hVXe8knNQQIFl73b98EWD8C1/lXA6uMOS5jJTLTXDf2t2a5zUkvOdTEQt4=
+
+	node tx.js BTC verifymessage 'Thanks Ayms this module is great!' 'Hw/PE+L4GW8C4S+V/6rgDZx9UHHU8hVXe8knNQQIFl73b98EWD8C1/lXA6uMOS5jJTLTXDf2t2a5zUkvOdTEQt4=' 18v29GccczH8nxPVm3zQ1xVaxV5Wh4Yz9v
+
+	Signature verified - Public key 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	
+	node tx.js BTC verifymessage 'Thanks Ayms this module is great!' 'Hw/PE+L4GW8C4S+V/6rgDZx9UHHU8hVXe8knNQQIFl73b98EWD8C1/lXA6uMOS5jJTLTXDf2t2a5zUkvOdTEQt4=' 3NqxkcqbasHnTxQ6hHyMrJv5kC1D4o3jTC
+	
+	Signature verified - Public key 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	
+	node tx.js BTC verifymessage 'Thanks Ayms this module is great!' 'Hw/PE+L4GW8C4S+V/6rgDZx9UHHU8hVXe8knNQQIFl73b98EWD8C1/lXA6uMOS5jJTLTXDf2t2a5zUkvOdTEQt4=' bc1q2m87z4h0mwxdqjuetmgf95tdc9wmdqz7tg4540
+	
+	Signature verified - Public key 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	
+	node tx.js BCH verifymessage 'Thanks Ayms this module is great!' 'Hw/PE+L4GW8C4S+V/6rgDZx9UHHU8hVXe8knNQQIFl73b98EWD8C1/lXA6uMOS5jJTLTXDf2t2a5zUkvOdTEQt4=' qptvlc2kaldce5ztn90dpyk3dhq4md5qtc6jk64fjm
+	
+	Signature verified - Public key 038c71760a4aac81afd4a314dc989c1a0621d28aac584992a26d1993709bdafddb
+	
+	node tx.js ZEC verifymessage 'I am a signed Zcash message' 'IO5jX5/RhpIqbo52uOs1d9g0D5+Al4cpzyWyEitZYO24HFZbb6lI94k+X7LwhqmaEi6eorUzpDSG2JPArKTN1EU=' t1LF5Se66f3uRFPFLC86FSRBasbLqTbz86k
+	
+	Signature verified - Public key 0259a77bc3c5621b65e557a6cc83a45a8fc4a9aa5a8908ae8e9664f41cd345842f
+	
+## Notes for the devs
+
+The module is not trivial, any slight change can cause everything not to work any longer and can become difficult to identify at a certain point of time, therefore it is advised to periodically test the latest example in the multisig test vectors while making changes (if this one passes it's unlikely that something is wrong). In addition serialize/deserialize is not symetrical then ``true`` must be used when not coming from a Tx constructor transaction, initially this was a mistake due to misreading of segwit specs, we decided to keep it like this because double checking symetrical potential wrong things is just useless, therefore this adds a last serialize/deserialize independant check
+
+## Browserification process and bugs
+
+Please see [browserification](https://github.com/Ayms/bitcoin-transactions/tree/master/browserify/README.md)
+
+The User Interface code and the complete browserified javascript code is [here](https://github.com/Ayms/bitcoin-transactions/blob/master/html)
+
+There are probably some details to fix in the UI, for minor ones please email us, for others please post a bug or email
+
+Before posting or emailing something please open the browser javascript console and send the content to us at the same time if it shows some js errors
+
+### Related external bugs:
+
+- https://github.com/indutny/bn.js/issues/227 this causes BN code to be included twice by browserify
+- https://github.com/mishoo/UglifyJS2/issues/3443 surprisingly uglify does not support ES6
 
 ## Related projects :
 
